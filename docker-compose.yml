@@ -4,20 +4,15 @@ services:
   postgres:
     image: postgres:13
     environment:
-      - POSTGRES_DB=my_store
-      - POSTGRES_USER=nico
-      - POSTGRES_PASSWORD=admin123
+      - POSTGRES_DB=curso-node-e2e
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
     ports:
-      - 5432:5432
+      - 5433:5432
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
 
-  pgadmin:
-    image: dpage/pgadmin4
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@mail.com
-      - PGADMIN_DEFAULT_PASSWORD=root
-    ports:
-      - 5050:80
-
+volumes:
+  postgres_data:
+    external: true
 
