@@ -1,5 +1,6 @@
 const request = require('supertest')
 const createApp = require('../src/app')
+const { config } = require('../src/config/config')
 
 describe('Tests for app', () => {
 
@@ -7,7 +8,7 @@ describe('Tests for app', () => {
     let server = null
     let api = null
 
-    beforeEach(() => {
+    beforeAll(() => {
         app = createApp()
         server = app.listen(9000)
         api = request(app)
@@ -18,7 +19,32 @@ describe('Tests for app', () => {
         expect(res.statusCode).toEqual(200)
     })
 
-    afterEach(() => {
+    describe('GET /nueva-ruta', () => {
+
+        test('should return 401 without api key', async() => {
+            const {statusCode} = await api.get('/nueva-ruta')
+            expect(statusCode).toEqual(401)
+        })
+
+        test('should return 401 with invalid api key', async() => {
+            const {statusCode} = await api.get('/nueva-ruta').set({
+                api: '123456'
+            })
+
+            expect(statusCode).toEqual(401)
+        })
+
+        test('should return 200 with valid api key', async() => {
+            const {statusCode} = await api.get('/nueva-ruta').set({
+                api: config.apiKey
+            })
+
+            expect(statusCode).toEqual(200)
+        })
+
+    })
+
+    afterAll(() => {
         server.close()
     })
 })
