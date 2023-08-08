@@ -1,7 +1,7 @@
 const request = require('supertest')
 const createApp = require('../src/app')
 const { models } = require('../src/db/sequelize')
-
+const {upSeed, downSeed} = require('./utils/seed')
 
 describe('Tests for /auth path', () => {
 
@@ -9,10 +9,12 @@ describe('Tests for /auth path', () => {
     let server = null
     let api = null
 
-    beforeAll(() => {
+    beforeAll(async() => {
         app = createApp()
         server = app.listen(9000)
         api = request(app)
+
+        await upSeed()
     })
 
     describe('POST /login', () => {
@@ -30,7 +32,7 @@ describe('Tests for /auth path', () => {
         test('should return a 200 with valid credentials', async() => {
             const inputData = {
                 email: 'admin@mail.com',
-                password: 'admin123'
+                password: '123456'
             }
 
             const {statusCode, body} = await api.post('/api/v1/auth/login').send(inputData)
@@ -43,7 +45,8 @@ describe('Tests for /auth path', () => {
 
 
 
-    afterAll(() => {
+    afterAll(async () => {
+        await downSeed()
         server.close()
     })
 })

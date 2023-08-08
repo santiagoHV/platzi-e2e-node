@@ -1,6 +1,7 @@
 const request = require('supertest')
 const createApp = require('../src/app')
 const { models } = require('../src/db/sequelize')
+const {upSeed, downSeed} = require('./utils/seed')
 
 
 describe('Tests for /profile path', () => {
@@ -9,10 +10,12 @@ describe('Tests for /profile path', () => {
     let server = null
     let api = null
 
-    beforeAll(() => {
+    beforeAll(async() => {
         app = createApp()
         server = app.listen(9000)
         api = request(app)
+
+        await upSeed()
     })
 
     describe('GET /my-user', () => {
@@ -21,7 +24,7 @@ describe('Tests for /profile path', () => {
             const user = await models.User.findByPk('1')
             const inputData = {
                 email: user.email,
-                password: 'admin123' //TODO: refactor en semillas
+                password: '123456' //TODO: refactor en semillas
             }
 
             const { body } = await api.post('/api/v1/auth/login').send(inputData)
@@ -53,7 +56,8 @@ describe('Tests for /profile path', () => {
 
     })
 
-    afterAll(() => {
+    afterAll(async() => {
+        await downSeed()
         server.close()
     })
 })
