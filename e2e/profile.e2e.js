@@ -1,7 +1,7 @@
 const request = require('supertest')
 const createApp = require('../src/app')
 const { models } = require('../src/db/sequelize')
-const {upSeed, downSeed} = require('./utils/seed')
+const { upSeed, downSeed } = require('./utils/umzug')
 
 
 describe('Tests for /profile path', () => {
@@ -32,7 +32,7 @@ describe('Tests for /profile path', () => {
         })
 
         test('should return a 401', async() => {
-            const {statusCode} = await api.get('/api/v1/profile/my-user').set({
+            const { statusCode } = await api.get('/api/v1/profile/my-user').set({
                 'Authorization': `Bearer notoken123`
             })
 
@@ -42,7 +42,7 @@ describe('Tests for /profile path', () => {
         test('should return user data with valid token', async() => {
             const user = await models.User.findByPk('1')
 
-            const {statusCode, body} = await api.get('/api/v1/profile/my-user').set({
+            const { statusCode, body } = await api.get('/api/v1/profile/my-user').set({
                 'Authorization': `Bearer ${accessToken}`
             })
 

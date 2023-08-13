@@ -1,7 +1,7 @@
 const request = require('supertest')
 const createApp = require('../src/app')
 const { models } = require('../src/db/sequelize')
-const {upSeed, downSeed} = require('./utils/seed')
+const { upSeed, downSeed } = require('./utils/umzug')
 
 //Arrange - previo
 //Act - ejecutar
@@ -25,7 +25,7 @@ describe('Tests for /users path', () => {
         test('sould return a user', async() => {
             const user = await models.User.findByPk('1')
             const inputID = '1'
-            const {statusCode, body} = await api.get(`/api/v1/users/${inputID}`)
+            const { statusCode, body } = await api.get(`/api/v1/users/${inputID}`)
 
             expect(statusCode).toEqual(200)
             expect(body.id).toEqual(user.id)
@@ -54,7 +54,7 @@ describe('Tests for /users path', () => {
             }
 
             //usando destructuring del response
-            const {statusCode, body} = await api.post('/api/v1/users').send(inputData)
+            const { statusCode, body } = await api.post('/api/v1/users').send(inputData)
 
             expect(statusCode).toEqual(400)
             expect(body.message).toMatch('email')
@@ -66,10 +66,10 @@ describe('Tests for /users path', () => {
                 password: "password1234"
             }
 
-            const {statusCode, body} = await api.post('/api/v1/users').send(inputData)
+            const { statusCode, body } = await api.post('/api/v1/users').send(inputData)
 
             expect(statusCode).toEqual(201)
-            //check with db
+                //check with db
 
             const user = await models.User.findByPk(`${body.id}`)
             expect(user).toBeDefined()
