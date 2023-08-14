@@ -1,7 +1,18 @@
 const request = require('supertest')
 const createApp = require('../src/app')
-const { models } = require('../src/db/sequelize')
 const { upSeed, downSeed } = require('./utils/umzug')
+
+const mockSendMail = jest.fn()
+
+jest.mock('nodemailer', () => {
+    return {
+        createTransport: jest.fn().mockImplementation(() => {
+            return {
+                sendMail: mockSendMail
+            }
+        })
+    }
+})
 
 describe('Tests for /auth path', () => {
 
@@ -43,10 +54,37 @@ describe('Tests for /auth path', () => {
         })
     })
 
+    describe('POST /recovery', () => {
+        beforeAll(async() => {
+            mockSendMail.mockClear()
+        })
 
+        test('should return a 401 with unexistant mail', async() => {
+            const inputData = {
+                email: 'emailfake@mail.com'
+            }
 
-    afterAll(async() => {
-        await downSeed()
-        server.close()
+            const { statusCode } = await api.post('/api/v1/auth/recovery').send(inputData)
+            expect(statusCode).toEqual(401)
+        })
+
+        test('should return a 200 with valid mail', async() => {
+            const inputData = {
+                email: 'costumer@mail.com'
+            }
+
+            mockSendMail.mockResolvedValue(true)
+            const { statusCode, body } = await api.post('/api/v1/auth/recovery').send(inputData)
+            expect(statusCode).toEqual(200)
+            expect(body.message).toEqual('mail sent')
+            expect(mockSendMail).toHaveBeenCalled()
+
+        })
+
+        afterAll(async() => {
+            await downSeed()
+            server.close()
+        })
+
     })
 })
